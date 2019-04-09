@@ -1,3 +1,6 @@
 datasets/
 .DS_Store
 .vscode
+*.numbers
+
+*.xlsx

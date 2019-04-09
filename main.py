@@ -47,7 +47,7 @@ for name, group in dataset.groupby(['user_id']):
     movies_user.append(tupla_name)
 
 
-itemsets, rules = apriori(movies_user, min_support=0.3,
+itemsets, rules = apriori(movies_user, min_support=0.27,
                           min_confidence=0.58)
 
 rules_rhs = filter(lambda rule: len(rule.lhs) ==
@@ -57,36 +57,36 @@ sortedRulesResult = sorted(rules_rhs, key=lambda rule: rule.lift)
 
 print(len(sortedRulesResult))
 
-resultDict = []
+# resultDict = []
 
 
-def calcInverseLift(conf, lift):
-    return (1-conf)/(1-(conf/lift))
+# def calcInverseLift(conf, lift):
+#     return (1-conf)/(1-(conf/lift))
 
 
-def calcChiSquare(supp, conf, lift):
-    a = (lift-1)**2
-    b = supp*conf
-    c = (conf-supp)*(lift-conf)
-    return a*(b/c)
+# def calcChiSquare(supp, conf, lift):
+#     a = (lift-1)**2
+#     b = supp*conf
+#     c = (conf-supp)*(lift-conf)
+#     return a*(b/c)
 
 
-for rule in sortedRulesResult:
-    resultDict.append([
-        (rule.lhs, rule.rhs),
-        rule.confidence,
-        rule.support,
-        rule.lift,
-        calcInverseLift(rule.confidence, rule.lift),
-        calcChiSquare(rule.support, rule.confidence, rule.lift)
-    ])
+# for rule in sortedRulesResult:
+#     resultDict.append([
+#         (rule.lhs, rule.rhs),
+#         rule.confidence,
+#         rule.support,
+#         rule.lift,
+#         calcInverseLift(rule.confidence, rule.lift),
+#         calcChiSquare(rule.support, rule.confidence, rule.lift)
+#     ])
 
 
-finalTable = pd.DataFrame(data=resultDict, columns=[
-                          'Regra', 'Confiança', 'Suporte', 'Lift A->B', 'Lift A->!B', 'ChiSquare'])
+# finalTable = pd.DataFrame(data=resultDict, columns=[
+#                           'Regra', 'Confiança', 'Suporte', 'Lift A->B', 'Lift A->!B', 'ChiSquare'])
 
-finalTable.sort_values(
-    by='Lift A->B', ascending=False).to_excel("ordered_by_lift-1m.xlsx")
+# finalTable.sort_values(
+#     by='Lift A->B', ascending=False).to_excel("ordered_by_lift-1m.xlsx")
 
-finalTable.sort_values(
-    by='ChiSquare', ascending=False).to_excel("ordered_by_chisquare-1m.xlsx")
+# finalTable.sort_values(
+#     by='ChiSquare', ascending=False).to_excel("ordered_by_chisquare-1m.xlsx")
