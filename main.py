@@ -33,13 +33,14 @@ def prep1m():
     col_item_data = ['movie_id', 'movie_title', 'categories']
 
     itemData = pd.read_csv("./datasets/ml-1m/movies.dat",  names=col_item_data, encoding="ISO-8859-1",
-                           delimiter="::",engine='python')
+                           delimiter="::", engine='python')
 
     dataset = pd.merge(data, itemData, on='movie_id', how='outer')
 
     return dataset
-    
-dataset = prep100k()
+
+
+dataset = prep1m()
 
 for name, group in dataset.groupby(['user_id']):
     tupla_name = tuple(group['movie_title'].values)
@@ -62,23 +63,30 @@ resultDict = []
 def calcInverseLift(conf, lift):
     return (1-conf)/(1-(conf/lift))
 
-def calcChiSquare(supp,conf,lift):
+
+def calcChiSquare(supp, conf, lift):
     a = (lift-1)**2
     b = supp*conf
     c = (conf-supp)*(lift-conf)
     return a*(b/c)
 
 
-
 for rule in sortedRulesResult:
     resultDict.append([
-        rule,
+        (rule.lhs, rule.rhs),
         rule.confidence,
         rule.support,
         rule.lift,
         calcInverseLift(rule.confidence, rule.lift),
-        calcChiSquare(rule.support,rule.confidence,rule.lift)
+        calcChiSquare(rule.support, rule.confidence, rule.lift)
     ])
 
 
-print(resultDict[1:5])
+finalTable = pd.DataFrame(data=resultDict, columns=[
+                          'Regra', 'Confiança', 'Suporte', 'Lift A->B', 'Lift A->!B', 'ChiSquare'])
+
+finalTable.sort_values(
+    by='Lift A->B', ascending=False).to_excel("ordered_by_lift-1m.xlsx")
+
+finalTable.sort_values(
+    by='ChiSquare', ascending=False).to_excel("ordered_by_chisquare-1m.xlsx")
